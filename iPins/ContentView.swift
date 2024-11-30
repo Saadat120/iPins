@@ -23,105 +23,64 @@ let sampleLocations = [
 ]
 
 struct ContentView: View {
-   @State private var region = MKCoordinateRegion(
-      center:CLLocationCoordinate2D(latitude: 40.7128, longitude: -74.0060),
-      span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
-   )
+   @State private var showMenu = false
+   @State private var selectedTab = 0
+   @State private var myPins = Events()
+   @State private var savedPins = Events()
+   @State private var allPins = Events(eventPins: [Pins(name: "Central Park", details: "Link Up", latitude: 40.7851, longitude: -73.9683, attendees: 1, Public: true), Pins(name: "Statue of Liverty", details: "Link Up", latitude: 40.6892, longitude: -74.0445, attendees: 2, Public: true), Pins(name: "Times Square", details: "Link Up", latitude: 40.7580, longitude: -73.9855, attendees: 20, Public: true)])
    var body: some View{
-      ScrollView {
-         VStack(alignment: .leading, spacing: 20) {
-            // Title
-            Text("Pin Details")
-               .font(.largeTitle)
-               .bold()
-               .padding(.horizontal)
-            
-            // Map Section
-            ZStack {
-               Map(coordinateRegion: $region, showsUserLocation: false, annotationItems: sampleLocations) { location in
-                     MapMarker(coordinate: location.coordinate, tint: .blue)
-                  }
-                  .frame(height: 300) // Adjust height to fit your design
-                  .cornerRadius(10)
-                  .padding()
+      NavigationStack {
+         ZStack{
+            TabView(selection: $selectedTab){
+               MapView(events: $allPins)
+                  .ignoresSafeArea(edges: .all)
+                  .tag(0)
                
+               Text("Random")
+                  .tag(1)
+               
+               Text("Random")
+                  .tag(2)
+               
+               Text("Random")
+                  .tag(3)
             }
-            .padding(.horizontal)
-            
-            // Public Events Section
-            SectionHeader(title: "Public Events")
-            VStack(spacing: 10) {
-               ForEach(0..<3, id: \.self) { _ in
-                  EventRow(eventName: "Event Name", eventDetails: "Details about the event")
+            .tabViewStyle(.page(indexDisplayMode: .never))
+            .ignoresSafeArea()
+               SideView(isShowing: $showMenu, selectedTab: $selectedTab)
+               
+               // Toolbar overlay
+               if !showMenu {
+                  VStack {
+                     HStack {
+                        Button(action: { showMenu.toggle() }) {
+                           Image(systemName: "line.3.horizontal")
+                              .padding()
+                              .background(Color.gray.opacity(0.7))
+                              .clipShape(RoundedRectangle(cornerRadius: 10))
+                           
+                        }
+                        Spacer()
+                        
+                        Button(action: {  }) {
+                           Image(systemName: "plus")
+                              .padding()
+                              .background(Color.gray.opacity(0.7))
+                              .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                     }
+                     .padding()
+                     Spacer()
+                  }
                }
-            }
-            .padding(.horizontal)
-            
-            // Saved Private Events Section
-            SectionHeader(title: "Saved Private Events")
-            VStack(spacing: 10) {
-               ForEach(0..<3, id: \.self) { _ in
-                  EventRow(eventName: "Private Event Name", eventDetails: "Details about private event")
-               }
-            }
-            .padding(.horizontal)
-            
-            // Join Button
-            Button(action: {
-               print("Join button pressed")
-            }) {
-               Text("Join")
-                  .font(.headline)
-                  .foregroundColor(.white)
-                  .frame(maxWidth: .infinity)
-                  .padding()
-                  .background(Color.blue)
-                  .cornerRadius(10)
-                  .padding(.horizontal)
-            }
-         }
-      }
-   }
-}
+         }//end ZStack
+         .toolbar(.hidden, for: .navigationBar)
+         
+      }//end NavigationStack
+      .ignoresSafeArea(edges:.all)
 
-struct SectionHeader: View {
-   let title: String
-   
-   var body: some View {
-      Text(title)
-         .font(.title2)
-         .bold()
-         .padding(.horizontal)
-   }
-}
-
-struct EventRow: View {
-   let eventName: String
-   let eventDetails: String
-   
-   var body: some View {
-      HStack {
-         Circle()
-            .fill(Color.blue)
-            .frame(width: 40, height: 40)
-            .overlay(
-               Image(systemName: "mappin.and.ellipse")
-                  .foregroundColor(.white)
-            )
-         VStack(alignment: .leading) {
-            Text(eventName)
-               .font(.headline)
-            Text(eventDetails)
-               .font(.subheadline)
-               .foregroundColor(.gray)
-         }
-         Spacer()
-      }
-      .padding()
-      .background(Color.gray.opacity(0.1))
-      .cornerRadius(10)
-   }
-}
+   }//end body
+}//end Struct
 
 #Preview {
     ContentView()
