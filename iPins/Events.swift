@@ -8,7 +8,7 @@
 import Foundation
 
 struct Pins: Identifiable, Hashable{
-  var id: Int?
+  let id = UUID()
   let name: String
   let details: String
   let latitude: Double

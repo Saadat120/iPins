@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		B5D51DE72CE8239E00FD684B /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5D51DE62CE8239E00FD684B /* MapKit.framework */; };
+		B5F85C922D038EF800F6961F /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = B5F85C912D038EF800F6961F /* RealmSwift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5F85C922D038EF800F6961F /* RealmSwift in Frameworks */,
 				B5D51DE72CE8239E00FD684B /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,6 +95,7 @@
 			);
 			name = iPins;
 			packageProductDependencies = (
+				B5F85C912D038EF800F6961F /* RealmSwift */,
 			);
 			productName = iPins;
 			productReference = B5D51DD42CE8142B00FD684B /* iPins.app */;
@@ -122,6 +125,9 @@
 			);
 			mainGroup = B5D51DCB2CE8142B00FD684B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				B5F85C8E2D038EF800F6961F /* XCRemoteSwiftPackageReference "realm-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = B5D51DD52CE8142B00FD684B /* Products */;
 			projectDirPath = "";
@@ -354,6 +360,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		B5F85C8E2D038EF800F6961F /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		B5F85C912D038EF800F6961F /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = B5F85C8E2D038EF800F6961F /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B5D51DCC2CE8142B00FD684B /* Project object */;
 }

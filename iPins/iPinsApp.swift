@@ -9,9 +9,13 @@ import SwiftUI
 
 @main
 struct iPinsApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+  @StateObject var mapModel: MapModel = MapModel()
+  var body: some Scene {
+    WindowGroup {
+      let _ = UserDefaults.standard.set(false, forKey: "_UIConstraintBasedLayouyLogUnsatisfiable")
+      let _ = print(
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!.path)
+      ContentView()
     }
+  }
 }
