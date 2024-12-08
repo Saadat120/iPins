@@ -25,7 +25,7 @@ struct ContentView: View {
               Label("All Pins", systemImage: "map")
             }
             .tag(0)
-          EventView(events: $allPins)
+          MyPinsView(events: $allPins)
             .tabItem {
               Label("MyPins", systemImage: "mappin.and.ellipse")
             }

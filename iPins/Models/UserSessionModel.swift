@@ -19,18 +19,30 @@ class User: Object, Identifiable {
 
 
 class UserSessionModel: ObservableObject{
-  @Published var userSession = User()
+  @Published var userSession: User
   @Published var loggedIn: Bool
   @Published var error: String
   @Published var alert: Bool
   let realm: Realm
   
   init(){
+    
+    self.userSession = User()
     self.loggedIn = false
     self.error = ""
     self.alert = false
     
     do{
+      let config = Realm.Configuration(
+        schemaVersion: 6, // Increment this version number
+        migrationBlock: { migration, oldSchemaVersion in
+          if oldSchemaVersion < 6 {
+            migration.enumerateObjects(ofType: User.className()) { oldObject, newObject in
+              newObject?["newField"] = "defaultValue"
+            }
+          }
+        })
+      Realm.Configuration.defaultConfiguration = config
       realm = try Realm()
     } catch{
       fatalError("Error Initializing Realm: \(error)")

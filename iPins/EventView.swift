@@ -14,21 +14,7 @@ struct EventView: View {
   @Binding var events: Events
   @State private var searchText = ""
   
-  var filteredEvents: [Pins] {
-    if searchText.isEmpty{
-      return Array(events.eventPins)
-    } else{
-      return events.eventPins.filter{ $0.name.localizedCaseInsensitiveContains(searchText)}
-    }
-  }
-  
-  @State private var offsetY: CGFloat = UIScreen.main.bounds.height/2 // Initial Offset
-  @State private var dragOffset: CGFloat = 0 //offset during dragging
-  let minHeight: CGFloat = 100  // Expanded position
-  let maxHeight: CGFloat = UIScreen.main.bounds.height - 150 // Collapsed position
-
-  var body: some View {
-    
+  var body: some View {  
       // Map Section
     MapView(mapModel: mapModel, userSessionModel: userSessionModel, events: $events)
         .ignoresSafeArea(.all)
