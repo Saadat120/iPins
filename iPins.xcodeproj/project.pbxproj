@@ -17,7 +17,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		B5D51DE92CE8243C00FD684B /* Exceptions for "iPins" folder in "iPins" target */ = {
+		B559F9B72D050DE100961B4C /* Exceptions for "iPins" folder in "iPins" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -30,7 +30,7 @@
 		B5D51DD62CE8142B00FD684B /* iPins */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				B5D51DE92CE8243C00FD684B /* Exceptions for "iPins" folder in "iPins" target */,
+				B559F9B72D050DE100961B4C /* Exceptions for "iPins" folder in "iPins" target */,
 			);
 			path = iPins;
 			sourceTree = "<group>";

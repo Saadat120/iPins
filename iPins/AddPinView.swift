@@ -9,118 +9,109 @@ import SwiftUI
 import RealmSwift
 
 struct AddPinView: View {
+  @ObservedObject var mapModel: MapModel
+  @ObservedObject var userSessionModel: UserSessionModel
+  @State private var offsetY: CGFloat = UIScreen.main.bounds.height/2 // Initial Offset
+  let initialHeight: CGFloat = UIScreen.main.bounds.height/3
   @Binding var addPin: Bool
+  @State private var showLogin: Bool = false
   @State private var name: String = ""
   @State private var details: String = ""
-//  @State private var latitude: Double
-//  @State private var longitude: Double
+  @State private var longitude: Double = 0
+  @State private var latitude: Double = 0
   @State private var attendees: String = ""
   @State private var isPublic: Bool = true
-  
+
   @ObservedResults(Pin.self) var pins
-  @Environment(\.dismiss) private var dismiss
   
   var body: some View {
-    if addPin{
-      VStack(spacing: 30){
-        HStack(spacing: 75){
-          Button(action: { addPin.toggle() }, label: {Text("Cancel")})
-          Text("New Pin")
-          Button(action: { addPin.toggle() }, label: {Text("Add") })
-        }
-        
-        Form{
-          TextField("Enter Pin Name", text: $name)
-          TextField("Enter Pin detail", text: $details)
-          TextField("Enter Number of Attendees", text: $attendees)
-            .keyboardType(.numberPad)
-          Toggle("Public", isOn: $isPublic)
-          Button(
-            action: {
-              let pin = Pin()
-              pin.name = name
-              pin.details = details
-              pin.attendees = Int(attendees) ?? 0
-              pin.isPublic = isPublic
-              dismiss()
-              
-              $pins.append(pin)
-            },
-            label: { Text("Save")}).buttonStyle(.bordered)
-        }
-      }
-      .presentationDetents([.medium, .large])
+    ZStack{
+      if addPin && userSessionModel.loggedIn{
+        VStack(spacing: 20){
+          Spacer()
+          HStack(spacing: 80){
+            Button(action: { addPin.toggle() }, label: {Text("Cancel")})
+            Text("New Pin")
+            Button(action: { sendPinData(); addPin.toggle() }, label: {Text("Add") })
+          }
+          Form{
+            TextField("Enter Pin Name", text: $name)
+            TextArea("Enter Pin Details", text: $details)
+            Text("Longitude: \(String(Double(mapModel.tappedCoordinate?.longitude ?? 0)))")
+              .padding(.vertical, 6)
+            Text("Latitude: \(String(Double(mapModel.tappedCoordinate?.latitude ?? 0)))")
+              .padding(.vertical, 6)
+            TextField("Enter Number of Attendees", text: $attendees)
+              .keyboardType(.numberPad)
+              .padding(.vertical, 6)
+            Toggle("Public", isOn: $isPublic)
+          } //end Form
+          .clipShape(RoundedRectangle(cornerRadius: 10))
+        } //end VStack
+        .frame(maxWidth: .infinity)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(radius: 5)
+        .offset(y: initialHeight)
+        .transition(.move(edge: .bottom)) // Slide in/out from the bottom
+        .animation(.easeInOut, value: addPin) // Smooth animation
+      } //end if
+    }.sheet(isPresented: $showLogin){
+      LoginView()
+        .presentationDetents([.large]) // Optional: Adjust height of the sheet
+        .presentationDragIndicator(.visible)  // Optional: Add a drag indicator
     }
+    .onChange(of: addPin) { newValue in
+      // Show login sheet if the user is not logged in
+      if newValue && !userSessionModel.loggedIn {
+        showLogin = true
+      }
+    }
+  } //end body
+  private func sendPinData(){
+    if !name.isEmpty && !details.isEmpty  && !attendees.isEmpty{
+      if Double(mapModel.tappedCoordinate?.longitude ?? 0) != 0 && Double(mapModel.tappedCoordinate?.latitude ?? 0) != 0{
+        let pin = Pin()
+        pin.name = name
+        pin.details = details
+        pin.attendees = Int(attendees) ?? 0
+        pin.isPublic = isPublic
+        pin.latitude = Double(mapModel.tappedCoordinate?.latitude ?? 0)
+        pin.longitude = Double(mapModel.tappedCoordinate?.longitude ?? 0)
+        
+        $pins.append(pin)
+      } //end inner if
+    } //end outer if
+  } //end func sendPinData
+} //end struct
+
+//custom text area for body
+struct TextArea: View{
+  @Binding var text: String
+  let placeholder: String
+  
+  init(_ placeholder: String, text: Binding<String>) {
+    self.placeholder = placeholder
+    self._text = text
+  }
+  
+  var body: some View{
+    ZStack(alignment: .topLeading){
+      if text.isEmpty{
+        Text(placeholder)
+          .foregroundColor(Color(.placeholderText))
+      }
+      
+      TextEditor(text: $text)
+        .textFieldStyle(.roundedBorder)
+        .scrollContentBackground(.hidden)
+        .font(.title3)
+    } // end ZStack
+    .font(.body)
   }
 }
 
 #Preview {
-  AddPinView( addPin: .constant(true))
+  @Previewable @ObservedObject var userSessionModel = UserSessionModel()
+  AddPinView(mapModel: MapModel(), userSessionModel: userSessionModel, addPin: .constant(true))
 }
-
-
-//struct BottomhView: View{
-//  
-//  @State private var offsetY: CGFloat = UIScreen.main.bounds.height/2.25 // Initial Offset
-//  @State private var dragOffset: CGFloat = 0 //offset during dragging
-//  let expandedHeight: CGFloat = 100  // Expanded position
-//  let initialHeight: CGFloat = UIScreen.main.bounds.height/2.25
-//  let collapsedHeight: CGFloat = UIScreen.main.bounds.height - 150 // Collapsed position
-//  
-//  var body: some View{
-//    VStack(spacing: 0) {
-//      Capsule()
-//        .frame(width: 40, height: 5)
-//        .foregroundStyle(.gray)
-//        .padding(.top, 10)
-//      
-//      HStack{
-//        TextField("Search Events...", text: $searchText)
-//          .padding(8)
-//          .background(Color(.systemGray6))
-//          .clipShape(RoundedRectangle(cornerRadius: 8))
-//          .padding(.horizontal)
-//      }
-//      .padding(.top, 10)
-//      .padding(.bottom, 20)
-//      
-//      ScrollView{
-//        VStack(alignment: .leading, spacing: 10){
-//          Text(pins.name)
-//            .font(.title2)
-//            .bold()
-//            .padding(.horizontal)
-//          
-//          ForEach(Array(filteredEvents), id: \.self) { item in
-//            EventRow( eventName: item.name, eventDetails: item.details)
-//          }
-//        }
-//        .padding()
-//        
-//      } //end ScrollView
-//    } //end VStack
-//    .frame(maxWidth: .infinity)
-//    .background(Color(.systemBackground))
-//    .clipShape(RoundedRectangle(cornerRadius: 20))
-//    .shadow(radius: 5)
-//    .offset(
-//      y: max(min(offsetY + dragOffset, collapsedHeight), expandedHeight)
-//    )
-//    .gesture(
-//      DragGesture()
-//        .onChanged{ value in
-//          dragOffset = value.translation.height
-//        }
-//        .onEnded{ value in
-//          let newOffset = offsetY + dragOffset
-//          let closestPosition = getClosestPosition(for: newOffset)
-//          offsetY = closestPosition
-//          dragOffset = 0 // Reset drag offset
-//        }
-//    ) .animation(.easeInOut, value: dragOffset)
-//  }
-//  private func getClosestPosition(for currentOffset: CGFloat) -> CGFloat {
-//    let positions = [expandedHeight, initialHeight, collapsedHeight]
-//    return positions.min(by: { abs($0 - currentOffset) < abs($1 - currentOffset) }) ?? initialHeight
-//  } //end func
-//}

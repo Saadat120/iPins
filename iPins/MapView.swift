@@ -11,11 +11,10 @@ import RealmSwift
 
 struct MapView: View {
   @ObservedObject var mapModel: MapModel
+  @ObservedObject var userSessionModel: UserSessionModel
   @Binding var events: Events
   @State private var addPin = false
   @State var selectedPin: Pins?
-  @State var markerCount = 1
-  private func markerInc(){markerCount += 1}
   @ObservedResults(Pin.self) var pins
   
    var body: some View {
@@ -38,20 +37,22 @@ struct MapView: View {
          } //end map
          .onTapGesture(coordinateSpace: .local) { location in
            if let coordinate: CLLocationCoordinate2D = mapProxy.convert(location, from: .local){
-               mapModel.tappedCoordinate = coordinate
+             if addPin { mapModel.tappedCoordinate = coordinate }
            }
          } //end onTap
        } //end MapReader
        BottomView(pins: $events)
          .ignoresSafeArea()
-//       AddPinView(addPin: $addPin)
+       AddPinView(mapModel: mapModel, userSessionModel: userSessionModel, addPin: $addPin)
+         .animation(.easeInOut, value: addPin)
+         .transition(.move(edge: .bottom)) // Slide in/out from the bottom
        // Toolbar overlay
 
        //Plus Button
        VStack {
          HStack{
            Spacer()
-           Button(action: { addPin.toggle() }, label: {
+           Button(action: {addPin.toggle() }, label: {
              Image(systemName: "plus")
                .padding()
                .background(Color.gray.opacity(0.7))
@@ -62,7 +63,6 @@ struct MapView: View {
          Spacer()
        } //end VStack
      } //end ZStaCK
-     .sheet(isPresented: $addPin,content: { AddPinView(addPin: $addPin) })
    } //end body
 } //end struct
 
@@ -97,7 +97,7 @@ struct MapView: View {
       )
     ]
   )
-  MapView(mapModel: MapModel(), events: $allPins)
+  MapView(mapModel: MapModel(), userSessionModel: UserSessionModel(), events: $allPins)
 }
 
 struct BottomView: View{

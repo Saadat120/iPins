@@ -10,6 +10,7 @@ import SwiftUI
 struct EventView: View {
   // Access the ViewModel shared across the environment.
   @EnvironmentObject var mapModel: MapModel
+  @EnvironmentObject var userSessionModel: UserSessionModel
   @Binding var events: Events
   @State private var searchText = ""
   
@@ -29,7 +30,7 @@ struct EventView: View {
   var body: some View {
     
       // Map Section
-      MapView(mapModel: mapModel, events: $events)
+    MapView(mapModel: mapModel, userSessionModel: userSessionModel, events: $events)
         .ignoresSafeArea(.all)
     
   } //end body
@@ -95,4 +96,5 @@ struct EventView: View {
     )
     EventView(events: $allPins)
       .environmentObject(MapModel())
+      .environmentObject(UserSessionModel())
   }
